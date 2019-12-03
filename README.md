@@ -25,14 +25,12 @@ The dependency management tool is [Maven](https://maven.apache.org/).
 The web server is [Jetty](https://www.eclipse.org/jetty/).
 
 ### Requirements
-1. Respond to a GET `/greeting` with 200 HTTP status code
+1. [Respond to a GET `/greeting` with 200 HTTP status code](#requirement-1---respond-to-a-get-greeting-with-200-http-status-code)
 2. Respond to a GET `/greeting` with “Hello”
 3. Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
 4. Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
 
 #### Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
-// todo link here from TOC
-
 The first thing we want to do is create an _end to end_ test (E2E).  
 > Take a moment  
 > Think about what you expect the test to do.  
