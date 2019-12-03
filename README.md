@@ -23,6 +23,7 @@ The tutorial is written in [Scala](https://www.scala-lang.org/) since most of th
 The testing framework is [Specs2](http://etorreborre.github.io/specs2/).  
 The dependency management tool is [Maven](https://maven.apache.org/).  
 The web server is [Jetty](https://www.eclipse.org/jetty/).
+The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/)
 
 ### Requirements
 1. [Respond to a GET `/greeting` with 200 HTTP status code](#requirement-1---respond-to-a-get-greeting-with-200-http-status-code)
@@ -112,7 +113,7 @@ Allow your IDE to import the dependencies and `SpecWithJUnit` will be recognized
 > `SpecWithJUnit` brings with it a minimal set of imports and you have to add any additional imports yourself.  
 > Read more about [lightweight specs](https://github.com/etorreborre/specs2/blob/master/guide/src/test/scala/org/specs2/guide/LightweightSpecs.scala).  
 
-Let's continue our test by trying to create a GreeterServer class.  
+Let's continue our test by trying to instantiate a `GreeterServer` class.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -149,6 +150,29 @@ class GreeterServer {
 }
 ```
 Notice that I put the `GreeterServer` in the same file, to satisfy rule #3.  
+Run the test. You should expect it to pass, since it is only creating an object. But it doesn't run.  
+Specs2 complains that there is no assertion in the test. So let's add a simple Specs2's "ok" for now.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "say Hello" >> {
+      val greeterServer = new GreeterServer
+      ok
+    }
+  }
+}
+
+class GreeterServer {
+
+}
+```
+Run the test again. Now it passes.
 The test can now ask the server to start.
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
@@ -162,6 +186,7 @@ class GreeterServerE2ETest extends SpecWithJUnit {
     "say Hello" >> {
       val greeterServer = new GreeterServer
       greeterServer.start()
+      ok
     }
   }
 }
@@ -191,4 +216,63 @@ class GreeterServer {
   def start(): Unit = ???
 }
 ```
-Notice that `start()` is not implemented but there is no more compilation failure, so we satisfy rule #3.
+The compilation failure is fixed.  
+Now run the test.  
+It fails because `start()` is throwing an `an implementation is missing` exception.  
+
+**I cannot stress enough the importance of seeing the test fail. You only learn from a failing test.**  
+The test failed exactly as we expected. It called the `start()` method which throws an exception. We are now 100% sure that the test is indeed calling `start()`.  
+So, what can we do to satisfy rule #3?
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "say Hello" >> {
+      val greeterServer = new GreeterServer
+      greeterServer.start()
+      ok
+    }
+  }
+}
+
+class GreeterServer {
+  def start(): Unit = {}
+}
+```
+We give `start()` an empty implementation, so we satisfy rule #3. The test passes.  
+
+We have finished the _given_ section of the test, so we can move on to the _when_ section.  
+
+We want to make a GET request to the `/greeting` route.  
+The quickest way to make the request with the [sttp](https://sttp.readthedocs.io/en/latest/) client is by using a `basicRequest`.  
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "say Hello" >> {
+      val greeterServer = new GreeterServer
+      greeterServer.start()
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost/greeting")
+      val response = request.send()
+      
+      ok
+    }
+  }
+}
+
+class GreeterServer {
+  def start(): Unit = {}
+}
+```
