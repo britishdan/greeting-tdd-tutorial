@@ -35,6 +35,7 @@ The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial i
 2. Respond to a GET `/greeting` with “Hello”
 3. Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
 4. Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
+// todo link to sections
 
 #### Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
 The first thing we want to do is create an _end to end_ test (E2E).  
@@ -637,3 +638,10 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 ```
 The tests are more concice and readable. Let's move on to the next requirement.
 
+##### Summary
+In this section we learned:  
+1. Test code is code and should be kept to the same standards as production code.
+2. Adding another E2E test shows that "Hello" value goes through all the layers of the system and reaches the user.
+3. How important it is to see the failing test and that the error message is clear.
+
+#### Requirement 3 - Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
