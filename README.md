@@ -888,7 +888,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
   }
 }
 ```
-
+Obviously, the test fails with `'Hello' != 'I'm Sleeping'`.  
 Time to think...  
 
 How can write the test to make the server sleep?  
@@ -915,9 +915,181 @@ _ We could change the tests to assert "I'm Sleeping" instead of "Hello" if the t
 Here are some better ideas:
 - The server could request the time from an extenal time server by making a GET HTTP request. Then in our tests we can start a fake time server and set the time in it for each test. The server would get the url to the time server from a configuration file, which points to the fake time server in tests. You might not like this solution due to the operational cost in production of making an HTTP call to get the time. But still, it is a valid design.
 - The nap hours could be put into a configuration file that the server reads when it starts. Then in our tests we can put hours in the configuration file that are inside or outside the current system time. But this requires us to start and stop the server with each test, which is undesireable due to the time it adds to the build. But still, it is a valid design.
-- We could use reflection to load a fake clock class in tests and a real system clock class in production, as long as the classes are in the classpath. The name of the clock implementation class will be passed into the system or put into a configuration file. This is a common method used by libaraies (such as log4j and JDBC). This solution is advanced but it is a valid design.
+- We could use reflection to load a fake clock class in tests and a real system clock class in production, as long as the classes are in the classpath. Then in the test we can manipulate the fake clock with a static mutable variable. The name of the clock implementation class will be passed into the system or put into a configuration file. This is a common method used by libaraies (such as log4j and JDBC). This solution is advanced but it is a valid design.
 
 Let's implement the reflection solution.
 
-Summary
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.matcher.MatchResultImplicits
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.BeforeAll
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with BeforeAll with BeforeEach {
+  sequential
+  
+  val port = 9000
+  implicit val backend = HttpURLConnectionBackend()
+
+  private def givenGreeterServerIsRunning(): Unit = {
+    val greeterServer = new GreeterServer
+    greeterServer.start(port, "com.wix.MockClock")
+  }
+
+  private def whenGreetingIsCalled(withName: Option[String] = None) = {
+    val greetingBaseUri = uri"http://localhost:$port/greeting"
+    val greetingUri = withName match {
+      case None ⇒ uri"$greetingBaseUri"
+      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
+    }
+    val request = basicRequest.get(greetingUri)
+    val response = request.send()
+    response
+  }
+
+  override def beforeAll(): Unit = {
+    givenGreeterServerIsRunning()
+  }
+  
+  override protected def before(): Unit = {
+    MockClock.setHour(9)
+  }
+
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val response = whenGreetingIsCalled()
+
+      response.code.code must beEqualTo(200)
+    }
+
+    "Respond to a GET /greeting with Hello" >> {
+      val response = whenGreetingIsCalled()
+
+      response.body must beRight("Hello")
+    }
+    
+    "Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”" >> {
+      val Dalia = "Dalia"
+      val response = whenGreetingIsCalled(withName = Some(Dalia))
+
+      response.body must beRight(s"Hello $Dalia")
+    }
+    
+    "Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)" >> {
+      MockClock.setHour(15)
+      val response = whenGreetingIsCalled()
+
+      response.body must beRight("I'm Sleeping")
+    }
+  }
+}
+
+class MockClock extends Clock {
+  def hour: Int = MockClock.theHour.get()
+}
+
+object MockClock {
+  private val theHour: AtomicInteger = new AtomicInteger()
+
+  def setHour(hour: Int): Unit = theHour.set(hour)
+}
+```
+
+**/src/main/scala/com/wix/GreeterServer.scala**
+```scala
+package com.wix
+
+import org.eclipse.jetty.server.Server
+
+import scala.reflect.runtime.universe
+
+class GreeterServer {
+  def start(port: Int, clockClassName: String): Unit = {
+    val clock: Clock = getClock(clockClassName)
+    val server = new Server(port)
+    server.setHandler(new GreetingHandler(clock))
+    server.start()
+  }
+
+  private def getClock(clockClassName: String): Clock = {
+    val mirror = universe.runtimeMirror(getClass.getClassLoader)
+    val classSymbol = mirror.staticClass(clockClassName)
+    val constructorSymbol = classSymbol.primaryConstructor.asMethod
+
+    val classMirror = mirror.reflectClass(classSymbol)
+    classMirror.reflectConstructor(constructorSymbol).apply().asInstanceOf[Clock]
+  }
+}
+```
+
+**/src/main/scala/com/wix/GreeterHandler.scala**
+```scala
+package com.wix
+
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.eclipse.jetty.server
+import org.eclipse.jetty.server.handler.AbstractHandler
+
+class GreetingHandler(clock: Clock) extends AbstractHandler {
+  private val greeter = new Greeter(clock)
+
+  override def handle(
+                       target: String,
+                       request: server.Request,
+                       httpServletRequest: HttpServletRequest,
+                       httpServletResponse: HttpServletResponse
+                     ): Unit = {
+    if (target == "/greeting") {
+      val maybeName = Option(request.getParameter("name"))
+      val greeting = greeter.greet(maybeName)
+      httpServletResponse.getWriter.print(greeting)
+      request.setHandled(true)
+    }
+  }
+}
+```
+
+**/src/main/scala/com/wix/Greeter.scala**
+```scala
+package com.wix
+
+class Greeter(clock: Clock) {
+  def greet(maybeName: Option[String]): String = {
+    (isAwake, maybeName) match {
+      case (true, None) ⇒ s"Hello"
+      case (true, Some(name)) ⇒ s"Hello $name"
+      case (false, _) ⇒ "I'm Sleeping"
+    }
+  }
+
+  private def isAwake: Boolean = {
+    clock.hour < 14 || clock.hour > 15
+  }
+}
+```
+
+**/src/main/scala/com/wix/Clock.scala**
+```scala
+package com.wix
+
+import java.util.{Calendar, TimeZone}
+
+trait Clock {
+  def hour: Int
+}
+
+class SystemTimeClock extends Clock {
+  override def hour: Int = {
+    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    calendar.get(Calendar.HOUR_OF_DAY)
+  }
+}
+
+```
+
+
+##### Summary
 1. TDD makes us think about the design of our system and hence it is said that TDD drives the design.
