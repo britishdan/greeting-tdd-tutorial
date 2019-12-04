@@ -257,6 +257,41 @@ We have finished the _given_ section of the test, so we can move on to the _when
 We want to make a GET request to the `/greeting` route.  
 The quickest way to make the request with the [sttp](https://sttp.readthedocs.io/en/latest/) client is by using a `basicRequest`.  
 
+**/pom.xml**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wix</groupId>
+    <artifactId>greeting-server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-core_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-junit_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.softwaremill.sttp/core -->
+    <dependency>
+        <groupId>com.softwaremill.sttp.client</groupId>
+        <artifactId>core_2.12</artifactId>
+        <version>1.7.2</version>
+        <scope>test</scope>
+    </dependency>
+</project>
+```
+
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
 package com.wix
@@ -284,7 +319,48 @@ class GreeterServer {
 }
 ```
 Notice `basicRequest.get(uri"?????/greeting")`.  
-We do not know where to send the request because we have not started the web server. So let's to it.  
+We do not know where to send the request because we have not created and started the Jetty web server. So let's to it.  
+
+**/pom.xml**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.wix</groupId>
+    <artifactId>greeting-server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-core_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-junit_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.softwaremill.sttp.client/core -->
+    <dependency>
+        <groupId>com.softwaremill.sttp.client</groupId>
+        <artifactId>core_2.12</artifactId>
+        <version>2.0.0-RC3</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>9.4.24.v20191120</version>
+    </dependency>
+</project>
+```
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -489,6 +565,7 @@ In this section we learned:
 #### Requirement 2 - Respond to a GET `/greeting` with “Hello”
 We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with "Hello"._  
+
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
 package com.wix
@@ -678,7 +755,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     val greetingBaseUri = uri"http://localhost:$port/greeting"
     val greetingUri = withName match {
       case None ⇒ uri"$greetingBaseUri"
-      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
+      case Some(name) ⇒ uri"$greetingBaseUri?name=$name"
     }
     val request = basicRequest.get(greetingUri)
     val response = request.send()
@@ -849,7 +926,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     val greetingBaseUri = uri"http://localhost:$port/greeting"
     val greetingUri = withName match {
       case None ⇒ uri"$greetingBaseUri"
-      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
+      case Some(name) ⇒ uri"$greetingBaseUri?name=$name"
     }
     val request = basicRequest.get(greetingUri)
     val response = request.send()
@@ -943,7 +1020,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     val greetingBaseUri = uri"http://localhost:$port/greeting"
     val greetingUri = withName match {
       case None ⇒ uri"$greetingBaseUri"
-      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
+      case Some(name) ⇒ uri"$greetingBaseUri?name=$name"
     }
     val request = basicRequest.get(greetingUri)
     val response = request.send()
@@ -1089,7 +1166,7 @@ class SystemTimeClock extends Clock {
 }
 
 ```
-
+Run the tests and see that they pass.
 
 ##### Summary
 1. TDD makes us think about the design of our system and hence it is said that TDD drives the design.
