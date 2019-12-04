@@ -823,3 +823,101 @@ In this section we learned:
 1. Adding another E2E test for a request value that goes through the layers
 2. Importance of seeing the failing test message
 3. Refactoring - separation of concerns
+
+#### Requirement 4 - Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
+Let's start to write the test.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.matcher.MatchResultImplicits
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.BeforeAll
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with BeforeAll {
+  val port = 9000
+  implicit val backend = HttpURLConnectionBackend()
+
+  private def givenGreeterServerIsRunning(): Unit = {
+    val greeterServer = new GreeterServer
+    greeterServer.start(port)
+  }
+
+  private def whenGreetingIsCalled(withName: Option[String] = None) = {
+    val greetingBaseUri = uri"http://localhost:$port/greeting"
+    val greetingUri = withName match {
+      case None ⇒ uri"$greetingBaseUri"
+      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
+    }
+    val request = basicRequest.get(greetingUri)
+    val response = request.send()
+    response
+  }
+
+  override def beforeAll(): Unit = {
+    givenGreeterServerIsRunning()
+  }
+
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val response = whenGreetingIsCalled()
+
+      response.code.code must beEqualTo(200)
+    }
+
+    "Respond to a GET /greeting with Hello" >> {
+      val response = whenGreetingIsCalled()
+
+      response.body must beRight("Hello")
+    }
+    
+    "Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”" >> {
+      val Dalia = "Dalia"
+      val response = whenGreetingIsCalled(withName = Some(Dalia))
+
+      response.body must beRight(s"Hello $Dalia")
+    }
+    
+    "Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)" >> {
+      val response = whenGreetingIsCalled()
+
+      response.body must beRight("I'm Sleeping")
+    }
+  }
+}
+```
+
+Time to think...  
+
+How can write the test to make the server sleep?  
+Hmm... Well, how would we implement the production code?  
+Usually, we would get the system time or use a library (like joda-time) to get the time from the internal clock.  
+But how can the test change the system's internal clock? Even if it is possible, it sounds destructive and probably not a good idea to manipulate the computer's clock.  
+So we need a different way to get the time.  
+
+Take a few minutes to think about it and then come back.  
+
+Really... Stand up and walk away...  Think about it and come back in a few minutes.
+
+Ready?
+
+Welcome back :)
+
+Some ideas that come to mind:
+- We agree that the first idea of manipulating the system time is not a good idea.
+_ We could change the tests to assert "I'm Sleeping" instead of "Hello" if the tests are running during nap time. This is not desireable because we want all the features of the system to be tested at all times.
+- We could add the time to the request in the same way that name is passed. Then in our server we could check that if the time param exists, use it instead of the system's clock. Adding this param to the user facing API makes the API untidy and opens up the system for hacking which makes the system vulnerable. So it is also not a good idea.
+- We could add a configuration file that our server will read when it starts. In the configuration file we can add a "testing" flag. If the configuration is in test mode, we could say that the server is sleeping. The problem with this solution is that it adds a branch to the server (if (inTestMode) ... else ... ). That means that only the test side of the branch is tested and we never test the production branch. So it is also not a good idea.
+
+
+Here are some better ideas:
+- The server could request the time from an extenal time server by making a GET HTTP request. Then in our tests we can start a fake time server and set the time in it for each test. The server would get the url to the time server from a configuration file, which points to the fake time server in tests. You might not like this solution due to the operational cost in production of making an HTTP call to get the time. But still, it is a valid design.
+- The nap hours could be put into a configuration file that the server reads when it starts. Then in our tests we can put hours in the configuration file that are inside or outside the current system time. But this requires us to start and stop the server with each test, which is undesireable due to the time it adds to the build. But still, it is a valid design.
+- We could use reflection to load a fake clock class in tests and a real system clock class in production, as long as the classes are in the classpath. The name of the clock implementation class will be passed into the system or put into a configuration file. This is a common method used by libaraies (such as log4j and JDBC). This solution is advanced but it is a valid design.
+
+Let's implement the reflection solution.
+
+Summary
+1. TDD makes us think about the design of our system and hence it is said that TDD drives the design.
