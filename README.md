@@ -1013,7 +1013,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 
   private def givenGreeterServerIsRunning(): Unit = {
     val greeterServer = new GreeterServer
-    greeterServer.start(port, "com.wix.MockClock")
+    greeterServer.start(port, "com.wix.FakeClock")
   }
 
   private def whenGreetingIsCalled(withName: Option[String] = None) = {
@@ -1032,7 +1032,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
   }
   
   override protected def before(): Unit = {
-    MockClock.setHour(9)
+    FakeClock.setHour(9)
   }
 
   "GreeterServer" should {
@@ -1056,7 +1056,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     }
     
     "Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)" >> {
-      MockClock.setHour(15)
+      FakeClock.setHour(15)
       val response = whenGreetingIsCalled()
 
       response.body must beRight("I'm Sleeping")
@@ -1064,11 +1064,11 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
   }
 }
 
-class MockClock extends Clock {
-  def hour: Int = MockClock.theHour.get()
+class FakeClock extends Clock {
+  def hour: Int = FakeClock.theHour.get()
 }
 
-object MockClock {
+object FakeClock {
   private val theHour: AtomicInteger = new AtomicInteger()
 
   def setHour(hour: Int): Unit = theHour.set(hour)
@@ -1166,7 +1166,12 @@ class SystemTimeClock extends Clock {
 }
 
 ```
-Run the tests and see that they pass.
+Run the tests and see that they pass.  
+Notice that the `SystemTimeClock` class is not tested. This is ok since we consider the `java.util` library to be well tested. But none the less, as with any integration, we will have to check that it works well when we deploy it to production.  
+
+You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.
+
+
 
 ##### Summary
-1. TDD makes us think about the design of our system and hence it is said that TDD drives the design.
+1. Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.
