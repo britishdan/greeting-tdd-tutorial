@@ -654,7 +654,7 @@ In this section we learned:
 
 #### Requirement 3 - Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
 We want our test to read:  
-_Given a running web server, when a GET request is made to `/greeting` with `?name=Name` query param, the web server should respond with "Hello Name"._ 
+_Given a running web server, when a GET request is made to `/greeting` with the `?name=Name` query param, the web server should respond with "Hello Name"._ 
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -674,10 +674,11 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     greeterServer.start(port)
   }
 
-  private def whenGreetingIsCalled(name: Option[String] = None) = {
-    val greetingUri = name match {
-      case None ⇒ uri"http://localhost:$port/greeting"
-      case Some(n) ⇒ uri"http://localhost:$port/greeting?name=$n"
+  private def whenGreetingIsCalled(withName: Option[String] = None) = {
+    val greetingBaseUri = uri"http://localhost:$port/greeting"
+    val greetingUri = withName match {
+      case None ⇒ uri"$greetingBaseUri"
+      case Some(n) ⇒ uri"$greetingBaseUri?name=$n"
     }
     val request = basicRequest.get(greetingUri)
     val response = request.send()
@@ -703,7 +704,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
     
     "Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”" >> {
       val Dalia = "Dalia"
-      val response = whenGreetingIsCalled(name = Some(Dalia))
+      val response = whenGreetingIsCalled(withName = Some(Dalia))
 
       response.body must beRight(s"Hello $Dalia")
     }
@@ -771,7 +772,8 @@ class GreetingHandler extends AbstractHandler {
   }
 }
 ```
-The tests are now green so it is time to refactor!  
+The tests are now green.  
+It is time to refactor!  
 It has become clear that the `GreetingHandler` is doing more than one thing. The handler is creating the greeting and also dealing with the Jetty request and response. Let's seperate the concerns to separate classes.  
 
 **/src/main/scala/com/wix/GreeterHandler.scala**
