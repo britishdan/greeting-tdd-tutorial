@@ -1171,7 +1171,138 @@ Notice that the `SystemTimeClock` class is not tested. This is ok since we consi
 
 You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.
 
+**/pom.xml**
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.wix</groupId>
+    <artifactId>greeting-server</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    
+    <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-core_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <dependency>
+        <groupId>org.specs2</groupId>
+        <artifactId>specs2-junit_2.12</artifactId>
+        <version>4.8.1</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.softwaremill.sttp.client/core -->
+    <dependency>
+        <groupId>com.softwaremill.sttp.client</groupId>
+        <artifactId>core_2.12</artifactId>
+        <version>2.0.0-RC3</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-server -->
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
+        <version>9.4.24.v20191120</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jmock/jmock -->
+    <dependency>
+        <groupId>org.jmock</groupId>
+        <artifactId>jmock</artifactId>
+        <version>2.12.0</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.jmock/jmock-junit4 -->
+    <dependency>
+        <groupId>org.jmock</groupId>
+        <artifactId>jmock-junit4</artifactId>
+        <version>2.12.0</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.wix/specs2-jmock -->
+    <dependency>
+        <groupId>com.wix</groupId>
+        <artifactId>specs2-jmock_2.12</artifactId>
+        <version>1.3.0</version>
+        <scope>test</scope>
+    </dependency>
+</project>
+```
+
+**/src/test/scala/com/wix/GreeterTest.scala**
+```scala
+package com.wix
+
+import com.wixpress.common.specs2.JMock
+import org.specs2.specification.Scope
+import org.specs2.mutable.SpecWithJUnit
+
+class GreeterTest extends SpecWithJUnit with JMock {
+
+  trait Context extends Scope {
+    val mockClock = mock[Clock]
+    val greeter = new Greeter(mockClock)
+  }
+
+  "Greeter" should {
+    "be awake when the hour is 13" in new Context {
+      checking {
+        allowing(mockClock).hour willReturn 13
+      }
+
+      greeter.greet() must beEqualTo("Hello")
+    }
+
+    "be asleep when the hour is 14" in new Context {
+      checking {
+        allowing(mockClock).hour willReturn 14
+      }
+
+      greeter.greet() must beEqualTo("I'm Sleeping")
+    }
+
+    "be asleep when the hour is 15" in new Context {
+      checking {
+        allowing(mockClock).hour willReturn 15
+      }
+
+      greeter.greet() must beEqualTo("I'm Sleeping")
+    }
+
+    "be awake when the hour is 16" in new Context {
+      checking {
+        allowing(mockClock).hour willReturn 16
+      }
+
+      greeter.greet() must beEqualTo("Hello")
+    }
+  }
+}
+```
+
+**/src/main/scala/com/wix/Greeter.scala**
+```scala
+package com.wix
+
+class Greeter(clock: Clock) {
+  def greet(maybeName: Option[String] = None): String = {
+    (isAwake, maybeName) match {
+      case (true, None) ⇒ s"Hello"
+      case (true, Some(name)) ⇒ s"Hello $name"
+      case (false, _) ⇒ "I'm Sleeping"
+    }
+  }
+
+  private def isAwake: Boolean = {
+    clock.hour < 14 || clock.hour > 15
+  }
+}
+```
+The tests all pass.
 
 ##### Summary
 1. Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.
