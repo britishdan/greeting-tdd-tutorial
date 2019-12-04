@@ -16,14 +16,19 @@ Uncle Bob describes TDD with [3 simple rules](http://butunclebob.com/ArticleS.Un
 > 2. You are not allowed to write any more of a unit test than is sufficient to fail; and compilation failures are failures.
 > 3. You are not allowed to write any more production code than is sufficient to pass the one failing unit test.
 
+#### The Red-Green-Refactor cycle
+// todo insert the image and explination
+
 ## Greeter server
-Let's create a web server that greets people but also likes to take an afternoon nap.
+Let's create a web server that greets people but also likes to take an afternoon nap.  
+This tutorial should take around 3-4 hours.
 
 The tutorial is written in [Scala](https://www.scala-lang.org/) since most of the backend at Wix is written in Scala.  
 The testing framework is [Specs2](http://etorreborre.github.io/specs2/).  
 The dependency management tool is [Maven](https://maven.apache.org/).  
-The web server is [Jetty](https://www.eclipse.org/jetty/).
-The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/)
+The web server is [Jetty](https://www.eclipse.org/jetty/).  
+The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/).  
+The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial is agnostic to IDE. The tutorial assumes you have an IDE that supports Scala.  
 
 ### Requirements
 1. [Respond to a GET `/greeting` with 200 HTTP status code](#requirement-1---respond-to-a-get-greeting-with-200-http-status-code)
@@ -33,7 +38,7 @@ The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/)
 
 #### Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
 The first thing we want to do is create an _end to end_ test (E2E).  
-> Take a moment  
+> _Take a moment_  
 > Think about what you expect the test to do.  
 > Try to decribe the test as a "Given, When, Then" sentance.  
 
@@ -62,7 +67,7 @@ First we will create a Maven project with this directory structure
 </project>
 ```
 
-We want our test to read like this:  
+We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with a 200 HTTP status code._  
 So let's create a Specs2 test class in our E2E test file.  
 
@@ -412,10 +417,11 @@ Let's clean up by moving the production classes to their own files in the main s
 ```scala
 package com.wix
 
+import org.specs2.matcher.MatchResultImplicits
 import org.specs2.mutable.SpecWithJUnit
 import sttp.client._
 
-class GreeterServerE2ETest extends SpecWithJUnit {
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits {
   "GreeterServer" should {
     "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
@@ -468,6 +474,7 @@ class GreetingHandler extends AbstractHandler {
   }
 }
 ```
+In your IDE, notice that there's warning at the end of the test after the closing brace. The warning is that `no implicits found...`. Add the Specs2 trait `MatchResultImplicits` that adds the implicits to get rid of the warning.  
 Run the test to make sure it still passes. The test feels like it also needs refactoring. But it is not clear what refactoring to make. So let's wait for another test to help make it clear.  
 We are ready for the next test.  
 
@@ -476,7 +483,157 @@ In this section we learned:
 1. How working _outside-in_ integrates the parts of the system and shows how the API will be used.
 2. The 3 rules of TDD.
 3. How important it is to see the failing test and that the error message is clear.
-4. Red-Green-Refactor cycle.
+4. The Red-Green-Refactor cycle.
 
+#### Requirement 2 - Respond to a GET `/greeting` with “Hello”
+We want our test to read:  
+_Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with "Hello"._  
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
 
-// Test code is as important (if not more important) than the production code. So let's refactor the test code.
+import org.specs2.matcher.MatchResultImplicits
+import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits {
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val greeterServer = new GreeterServer
+      val port = 9000
+      greeterServer.start(port)
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      response.code.code must beEqualTo(200)
+    }
+    
+    "Respond to a GET /greeting with Hello" >> {
+      val port = 9000
+      val greeterServer = new GreeterServer
+      greeterServer.start(port)
+
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+
+      response.body must beRight("Hello")
+    }
+  }
+}
+```
+We can use the `beRight` Specs2 matcher because `sttp` returns the response body as an Either.
+Before you run the tests, how do you expect the test to fail? What is the message you expect?  
+We expect the message to be `'' != 'Hello'`.  
+Now run the tests. The new test fails with a `Failed to bind` exception. This is because the new test is trying to start the greeter server again.  
+We want the server to start once before the tests run. So let's use the `BeforeAll` trait and move the code that starts the server to the `beforeAll()` method.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.matcher.MatchResultImplicits
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.BeforeAll
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with BeforeAll {
+  val port = 9000
+  
+  override def beforeAll(): Unit = {
+    val greeterServer = new GreeterServer
+    greeterServer.start(port)
+  }
+  
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      response.code.code must beEqualTo(200)
+    }
+    
+    "Respond to a GET /greeting with Hello" >> {
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+
+      response.body must beRight("Hello")
+    }
+  }
+}
+```
+Run the tests again. The second test fails as we expected: `'' != 'Hello'`.  
+Let's implement the feature to pass the test.
+
+**/src/main/scala/com/wix/GreeterHandler.scala**
+```scala
+package com.wix
+
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.eclipse.jetty.server
+import org.eclipse.jetty.server.handler.AbstractHandler
+
+class GreetingHandler extends AbstractHandler {
+  override def handle(
+                       target: String,
+                       request: server.Request,
+                       httpServletRequest: HttpServletRequest,
+                       httpServletResponse: HttpServletResponse
+                     ): Unit = {
+    if (target == "/greeting") {
+      httpServletResponse.getWriter.print("Hello")
+      request.setHandled(true)
+    }
+  }
+}
+```
+Run the tests. They both pass. It's time to refactor!  
+Adding the second test introduced code duplication. Test code is as important (if not more important) than the production code. So let's refactor the test code.  
+We only need one `HttpURLConnectionBackend` to manage the connection pool.  
+The call to the server is repeated, so we can extract it to a method.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.matcher.MatchResultImplicits
+import org.specs2.mutable.SpecWithJUnit
+import org.specs2.specification.BeforeAll
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with BeforeAll {
+  val port = 9000
+  implicit val backend = HttpURLConnectionBackend()
+
+  override def beforeAll(): Unit = {
+    val greeterServer = new GreeterServer
+    greeterServer.start(port)
+  }
+
+  private def whenGreetingIsCalled() = {
+    val request = basicRequest.get(uri"http://localhost:$port/greeting")
+    val response = request.send()
+    response
+  }
+
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val response = whenGreetingIsCalled()
+
+      response.code.code must beEqualTo(200)
+    }
+
+    "Respond to a GET /greeting with Hello" >> {
+      val response = whenGreetingIsCalled()
+
+      response.body must beRight("Hello")
+    }
+  }
+}
+```
+The tests are more concice and readable. Let's move on to the next requirement.
+
