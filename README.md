@@ -123,7 +123,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
     }
   }
@@ -139,7 +139,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
     }
   }
@@ -161,7 +161,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
       ok
     }
@@ -183,7 +183,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
       greeterServer.start()
       ok
@@ -205,7 +205,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
       greeterServer.start()
     }
@@ -232,7 +232,7 @@ import org.specs2.mutable.SpecWithJUnit
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
       greeterServer.start()
       ok
@@ -256,15 +256,16 @@ The quickest way to make the request with the [sttp](https://sttp.readthedocs.io
 package com.wix
 
 import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
 
 class GreeterServerE2ETest extends SpecWithJUnit {
   "GreeterServer" should {
-    "say Hello" >> {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
       val greeterServer = new GreeterServer
       greeterServer.start()
       
       implicit val backend = HttpURLConnectionBackend()
-      val request = basicRequest.get(uri"http://localhost/greeting")
+      val request = basicRequest.get(uri"?????/greeting")
       val response = request.send()
       
       ok
@@ -276,3 +277,204 @@ class GreeterServer {
   def start(): Unit = {}
 }
 ```
+We do not know where to send the request because we have not started the web server. So let's to it.  
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
+import org.eclipse.jetty.server.Server
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val greeterServer = new GreeterServer
+      val port = 9000
+      greeterServer.start(port)
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      ok
+    }
+  }
+}
+
+class GreeterServer {
+  def start(port: Int): Unit = {
+    val server = new Server(port)
+    server.start()
+  }
+}
+```
+Notice that the port is passed to `start()` so it's available in the test.  
+Run the test. It passes.  
+We have finished the _when_ section of the test, so we can move on to the _then_ section.  
+
+The request to `/greeting` should return a 200 status code.  
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
+import org.eclipse.jetty.server.Server
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val greeterServer = new GreeterServer
+      val port = 9000
+      greeterServer.start(port)
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      response.code.code must beEqualTo(200)
+    }
+  }
+}
+
+class GreeterServer {
+  def start(port: Int): Unit = {
+    val server = new Server(port)
+    server.start()
+  }
+}
+```
+Run the test. It fails with `404 != 200`. This is a clear and understandable error message, which is great! Complicated and long error messages are hard to understand later on, try to avoid them.  
+By seeing the test fail we have learned that the HTTP client call is reaching the web server and that the web server is responding to that call. Very exciting!  
+The web server is responding with 404 because we have not created the `/greeting` endpoint. So let's do it.  
+From reading the [Jetty](https://www.eclipse.org/jetty/) documentation, this is done with a `Handler`.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
+import org.eclipse.jetty.server
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.handler.AbstractHandler
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val greeterServer = new GreeterServer
+      val port = 9000
+      greeterServer.start(port)
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      response.code.code must beEqualTo(200)
+    }
+  }
+}
+
+class GreeterServer {
+  def start(port: Int): Unit = {
+    val server = new Server(port)
+    server.setHandler(new GreetingHandler)
+    server.start()
+  }
+}
+
+class GreetingHandler extends AbstractHandler {
+  override def handle(
+                       target: String,
+                       request: server.Request,
+                       httpServletRequest: HttpServletRequest,
+                       httpServletResponse: HttpServletResponse
+                     ): Unit = {
+    if (target == "/greeting") {
+      request.setHandled(true)
+    }
+  }
+}
+```
+Run the test. It passes. By seeing the test fail and then pass, we are sure that our last change fixed it. We are green!  
+We now have a running web server that returns 200 status code when the `/greeting` endpoint is called!!  
+
+This now brings me to the red-green-refactor TDD cycle.  
+First the test was red and then it passed and became green. The next step is to refactor the code.  
+Let's clean up by moving the production classes to their own files in the main scope so that they will be bundled in the JAR that is eventually deployed to production.
+
+**/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
+```scala
+package com.wix
+
+import org.specs2.mutable.SpecWithJUnit
+import sttp.client._
+
+class GreeterServerE2ETest extends SpecWithJUnit {
+  "GreeterServer" should {
+    "Respond to a GET /greeting with 200 HTTP status code" >> {
+      val greeterServer = new GreeterServer
+      val port = 9000
+      greeterServer.start(port)
+      
+      implicit val backend = HttpURLConnectionBackend()
+      val request = basicRequest.get(uri"http://localhost:$port/greeting")
+      val response = request.send()
+      
+      response.code.code must beEqualTo(200)
+    }
+  }
+}
+```
+
+**/src/main/scala/com/wix/GreeterServer.scala**
+```scala
+package com.wix
+
+import org.eclipse.jetty.server.Server
+
+class GreeterServer {
+  def start(port: Int): Unit = {
+    val server = new Server(port)
+    server.setHandler(new GreetingHandler)
+    server.start()
+  }
+}
+```
+
+**/src/main/scala/com/wix/GreeterHandler.scala**
+```scala
+package com.wix
+
+import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
+import org.eclipse.jetty.server
+import org.eclipse.jetty.server.handler.AbstractHandler
+
+class GreetingHandler extends AbstractHandler {
+  override def handle(
+                       target: String,
+                       request: server.Request,
+                       httpServletRequest: HttpServletRequest,
+                       httpServletResponse: HttpServletResponse
+                     ): Unit = {
+    if (target == "/greeting") {
+      request.setHandled(true)
+    }
+  }
+}
+```
+Run the test to make sure it still passes. We are ready for the next test.  
+
+##### Summary
+In this section we learned:  
+1. How working _outside-in_ integrates the parts of the system and shows how the API will be used.
+2. How to follow the 3 rules of TDD.
+3. How important it is to see the failing test and that the error message is clear.
+4. Red-Green-Refactor flow.
+
+
+// Test code is as important (if not more important) than the production code. So let's refactor the test code.
