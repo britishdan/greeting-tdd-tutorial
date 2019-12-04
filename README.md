@@ -277,6 +277,7 @@ class GreeterServer {
   def start(): Unit = {}
 }
 ```
+Notice `basicRequest.get(uri"?????/greeting")`.  
 We do not know where to send the request because we have not started the web server. So let's to it.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
@@ -403,7 +404,7 @@ class GreetingHandler extends AbstractHandler {
 Run the test. It passes. By seeing the test fail and then pass, we are sure that our last change fixed it. We are green!  
 We now have a running web server that returns 200 status code when the `/greeting` endpoint is called!!  
 
-This now brings me to the red-green-refactor TDD cycle.  
+This now brings me to the _Red-Green-Refactor_ TDD cycle.  
 First the test was red and then it passed and became green. The next step is to refactor the code.  
 Let's clean up by moving the production classes to their own files in the main scope so that they will be bundled in the JAR that is eventually deployed to production.
 
@@ -467,14 +468,15 @@ class GreetingHandler extends AbstractHandler {
   }
 }
 ```
-Run the test to make sure it still passes. We are ready for the next test.  
+Run the test to make sure it still passes. The test feels like it also needs refactoring. But it is not clear what refactoring to make. So let's wait for another test to help make it clear.  
+We are ready for the next test.  
 
 ##### Summary
 In this section we learned:  
 1. How working _outside-in_ integrates the parts of the system and shows how the API will be used.
-2. How to follow the 3 rules of TDD.
+2. The 3 rules of TDD.
 3. How important it is to see the failing test and that the error message is clear.
-4. Red-Green-Refactor flow.
+4. Red-Green-Refactor cycle.
 
 
 // Test code is as important (if not more important) than the production code. So let's refactor the test code.
