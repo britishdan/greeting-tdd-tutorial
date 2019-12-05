@@ -19,7 +19,7 @@ The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial i
 The first thing we want to do is create an _end to end_ test (E2E).  
 > _Take a moment_  
 > Think about what you expect the test to do.  
-> Try to decribe the test as a "Given, When, Then" sentance.  
+> Try to describe the test as a "Given, When, Then" sentance.  
 
 First we will create a Maven project with this directory structure
 ```
@@ -92,7 +92,7 @@ Add Specs2 and Specs2-junit as a Maven dependency.
 ```
 Allow your IDE to import the dependencies and `SpecWithJUnit` will be recognized.  
 > _Side note_  
-> When uing Specs2 you can inherit from `SpecificationWithJUnit` or `SpecWithJUnit`.  
+> When using Specs2 you can inherit from `SpecificationWithJUnit` or `SpecWithJUnit`.  
 > `SpecificationWithJUnit` imports all of the testing library and it increases your compile/build time.  
 > `SpecWithJUnit` brings with it a minimal set of imports and you have to add any additional imports yourself.  
 > Read more about [lightweight specs](https://github.com/etorreborre/specs2/blob/master/guide/src/test/scala/org/specs2/guide/LightweightSpecs.scala).  
@@ -299,7 +299,7 @@ class GreeterServer {
 }
 ```
 Notice `basicRequest.get(uri"?????/greeting")`.  
-We do not know where to send the request because we have not created and started the Jetty web server. So let's to it.  
+We do not know where to send the request because we have not created and started the Jetty web server. So let's do it.  
 
 **/pom.xml**
 ```xml

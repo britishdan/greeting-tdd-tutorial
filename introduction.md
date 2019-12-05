@@ -1,5 +1,5 @@
 # TDD Tutorial
-This tutorial will give you a glimps into how TDD is done at [Wix](https://www.wix.engineering/).  
+This tutorial will give you a glimpse into how TDD is done at [Wix](https://www.wix.engineering/).  
 The audience is assumed to have very little experience with TDD.  
 The tutorial is best experienced hands-on. Follow the tutorial in your own IDE.
 
@@ -9,7 +9,7 @@ The tutorial is best experienced hands-on. Follow the tutorial in your own IDE.
 ## Overview
 At Wix we use an _outside-in_ approach. We create tests that trigger the system from the API.  
 Testing from the _outside-in_ shows you how your users will see your API. Consider your tests as your first user.  
-Testing from the _outside-in_ means that the test will go through all the layers of the system. It guarentees that the system is always integrated.  
+Testing from the _outside-in_ means that the test will go through all the layers of the system. It guarantees that the system is always integrated.  
 > _Side note_  
 > The alternative is the _inside-out_ approach, where each layer is developed separately and then integrated at the end.
 

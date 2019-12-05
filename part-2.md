@@ -157,7 +157,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
   }
 }
 ```
-The tests are more concice and readable.  
+The tests are more concise and readable.  
 
 ## Summary
 In this section we learned:  
