@@ -246,7 +246,7 @@ class GreeterServer {
 ```
 The compilation failure is fixed.  
 Now run the test.  
-It fails because `start()` is throwing an `an implementation is missing` exception.  
+It fails because `start()` is implemented with `???`, which is a special Scala placeholder that allows a method to compile but throws an `an implementation is missing` exception when invoked. All new methods can be created with the placeholder.  
 
 **I cannot stress enough the importance of seeing the test fail. You only learn from a failing test.**  
 The test failed exactly as we expected. It called the `start()` method which throws an exception. We are now 100% sure that the test is indeed calling `start()`.  
