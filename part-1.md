@@ -10,11 +10,10 @@ The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/).
 The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial is agnostic to IDE. The tutorial assumes you have an IDE that supports Scala.  
 
 ### Requirements
-1. [Respond to a GET `/greeting` with 200 HTTP status code](#requirement-1---respond-to-a-get-greeting-with-200-http-status-code)
-2. Respond to a GET `/greeting` with “Hello”
-3. Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
-4. Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
-// todo link to sections
+1. [Respond to a GET `/greeting` with 200 HTTP status code](./part-1.md)
+2. [Respond to a GET `/greeting` with “Hello”](./part-2.md)
+3. [Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”](./part-3.md)
+4. [Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)](./part-4.md)
 
 #### Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
 The first thing we want to do is create an _end to end_ test (E2E).  
