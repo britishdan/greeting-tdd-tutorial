@@ -248,7 +248,9 @@ The compilation failure is fixed.
 Now run the test.  
 It fails because `start()` is implemented with `???`, which is a special Scala placeholder that allows a method to compile but throws an `an implementation is missing` exception when invoked. All new methods can be created with the placeholder.  
 
-**I cannot stress enough the importance of seeing the test fail. You only learn from a failing test.**  
+**I cannot stress enough the importance of seeing the test fail.**
+**You only learn from a failing test.**  
+
 The test failed exactly as we expected. It called the `start()` method which throws an exception. We are now 100% sure that the test is indeed calling `start()`.  
 So, what can we do to satisfy rule #3?
 
@@ -583,6 +585,8 @@ In this section we learned:
 2. The 3 rules of TDD.
 3. How important it is to see the failing test and that the error message is clear.
 4. The Red-Green-Refactor cycle.
+
+How do you feel about writing code like this? How do you feel about the stability and correctness of the system you have created so far? Do you think TDD helped to keep you focused? Did you write better production code than usual? Perhaps less production code than usual? Or perhaps it felt slow and painful?  
 
 #### Requirement 2 - Respond to a GET `/greeting` with “Hello”
 We want our test to read:  
