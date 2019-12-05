@@ -39,4 +39,5 @@ whereas running tests:
 > This feedback cycle can be summed up by the Golden Rule of TDD:
 > Never write new functionality without a failing test.
 
-Now, let's get some hands-on experience.
+Now, let's get some hands-on experience.  
+[Part 1](./part-1.md)

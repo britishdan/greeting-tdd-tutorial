@@ -169,3 +169,6 @@ In this section we learned:
 1. Adding another E2E test for a request value that goes through the layers
 2. Importance of seeing the failing test message
 3. Refactoring - separation of concerns
+
+We're ready for the last requirement.  
+[Part 4](./part-4.md)

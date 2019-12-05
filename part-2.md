@@ -157,10 +157,13 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
   }
 }
 ```
-The tests are more concice and readable. Let's move on to the next requirement.
+The tests are more concice and readable.  
 
 ##### Summary
 In this section we learned:  
 1. Test code is code and should be kept to the same standards as production code (in this case, the DRY principle).
 2. Adding another E2E test shows that "Hello" value goes through all the layers of the system and reaches the user.
 3. How important it is to see the failing test and that the error message is clear.
+
+Let's move on to the next requirement.  
+[Part 3](./part-3.md)

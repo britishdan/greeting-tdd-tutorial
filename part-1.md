@@ -534,7 +534,6 @@ class GreetingHandler extends AbstractHandler {
 ```
 In your IDE, notice that there's warning at the end of the test after the closing brace. The warning is that `no implicits found...`. Add the Specs2 trait `MatchResultImplicits` that adds the implicits to get rid of the warning.  
 Run the test to make sure it still passes. The test feels like it also needs refactoring. But it is not clear what refactoring to make. So let's wait for another test to help make it clear.  
-We are ready for the next test.  
 
 ##### Summary
 In this section we learned:  
@@ -550,3 +549,6 @@ In this section we learned:
 > Did you write better production code than usual?  
 > Perhaps less production code than usual?  
 > Or perhaps it felt slow and painful?  
+
+We are ready for the next test.  
+[Part 2](./part-2.md)
