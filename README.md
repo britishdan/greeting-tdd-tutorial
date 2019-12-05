@@ -11,7 +11,7 @@ Testing from the _outside-in_ means that the test will go through all the layers
 > The alternative is the _inside-out_ approach, where each layer is developed separately and then integrated at the end.
 
 #### The 3 rules of TDD
-Uncle Bob describes TDD with [3 simple rules](http://butunclebob.com/ArticleS.UncleBob.TheThreeRulesOfTdd)
+Uncle Bob describes TDD with [3 simple rules](http://butunclebob.com/ArticleS.UncleBob.TheThreeRulesOfTdd):
 > 1. You are not allowed to write any production code unless it is to make a failing unit test pass.
 > 2. You are not allowed to write any more of a unit test than is sufficient to fail; and compilation failures are failures.
 > 3. You are not allowed to write any more production code than is sufficient to pass the one failing unit test.
@@ -1354,4 +1354,6 @@ class Greeter(clock: Clock) {
 The tests all pass.
 
 ##### Summary
-1. Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.
+Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.  
+
+There is more we could do but we have implemented the system to satisfy the customer's requirements. We can show what we have and have a discussion with the customer about the next step.  
