@@ -988,7 +988,6 @@ _ We could change the tests to assert "I'm Sleeping" instead of "Hello" if the t
 - We could add the time to the request in the same way that name is passed. Then in our server we could check that if the time param exists, use it instead of the system's clock. Adding this param to the user facing API makes the API untidy and opens up the system for hacking which makes the system vulnerable. So it is also not a good idea.
 - We could add a configuration file that our server will read when it starts. In the configuration file we can add a "testing" flag. If the configuration is in test mode, we could say that the server is sleeping. The problem with this solution is that it adds a branch to the server (if (inTestMode) ... else ... ). That means that only the test side of the branch is tested and we never test the production branch. So it is also not a good idea.
 
-
 Here are some better ideas:
 - The server could request the time from an extenal time server by making a GET HTTP request. Then in our tests we can start a fake time server and set the time in it for each test. The server would get the url to the time server from a configuration file, which points to the fake time server in tests. You might not like this solution due to the operational cost in production of making an HTTP call to get the time. But still, it is a valid design.
 - The nap hours could be put into a configuration file that the server reads when it starts. Then in our tests we can put hours in the configuration file that are inside or outside the current system time. But this requires us to start and stop the server with each test, which is undesireable due to the time it adds to the build. But still, it is a valid design.
@@ -1133,6 +1132,33 @@ class GreetingHandler(clock: Clock) extends AbstractHandler {
 ```scala
 package com.wix
 
+class Greeter {
+  def greet(maybeName: Option[String]): String =
+    maybeName match {
+      case None ⇒ "Hello"
+      case Some(name) ⇒ s"Hello $name"
+    }
+}
+```
+
+**/src/main/scala/com/wix/Clock.scala**
+```scala
+package com.wix
+
+import java.util.{Calendar, TimeZone}
+
+trait Clock {
+  def hour: Int
+}
+```
+Notice that the FakeClock uses an `AtomicInteger` for the mutable state. We want access to this variable to be thread-safe because it is accessed from 2 threads, the test thread and the server thread.  
+
+Run the tests and see that the new test is still failing. We can now implement the feature using our new `Clock` class in the `greet()` method.  
+
+**/src/main/scala/com/wix/Greeter.scala**
+```scala
+package com.wix
+
 class Greeter(clock: Clock) {
   def greet(maybeName: Option[String]): String = {
     (isAwake, maybeName) match {
@@ -1164,12 +1190,13 @@ class SystemTimeClock extends Clock {
     calendar.get(Calendar.HOUR_OF_DAY)
   }
 }
-
 ```
-Run the tests and see that they pass.  
-Notice that the `SystemTimeClock` class is not tested. This is ok since we consider the `java.util` library to be well tested. But none the less, as with any integration, we will have to check that it works well when we deploy it to production.  
+Run the tests and see that they all pass.  
 
-You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.
+We have shown the implementation of the real clock `SystemTimeClock`. The class name `com.wix.SystemTimeClock` will be passed into the system in the production environment. Notice that the `SystemTimeClock` class is not tested. This is ok since we consider the `java.util` library to be well tested. But nonetheless, as with any integration, we will have to check that it works well when we deploy it to production.  
+
+You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.  
+We will use the `JMock` mocking library.  
 
 **/pom.xml**
 ```xml
