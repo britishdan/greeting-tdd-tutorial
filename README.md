@@ -17,14 +17,14 @@ Uncle Bob describes TDD with [3 simple rules](http://butunclebob.com/ArticleS.Un
 > 3. You are not allowed to write any more production code than is sufficient to pass the one failing unit test.
 
 #### The Red-Green-Refactor cycle
-![red-green-refactor](imgs/red-green-refactor.jpg)  
-The red, green, refactor cycle, by [Nat Pryce](http://www.natpryce.com/articles.html).  
-
 The cycle at the heart of TDD is:  
 1. Write a test;
 2. Write some code to get it working;
 3. Refactor the code to be as simple an implementation of the tested features as possible;
 4. Repeat.
+
+![red-green-refactor](imgs/red-green-refactor.jpg)  
+The red, green, refactor cycle, by [Nat Pryce](http://www.natpryce.com/articles.html).  
 
 As is written in [GOOS](http://www.growing-object-oriented-software.com/):
 > As we develop the system, we use TDD to give us feedback on the quality of both its implementation (“Does it work?”) and design (“Is it well structured?”). Developing test-first, we find we benefit twice from the effort.  
