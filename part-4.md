@@ -63,7 +63,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 }
 ```
 Obviously, the test fails with `'Hello' != 'I'm Sleeping'`.  
-Time to think... How can write the test to make the server sleep (without waiting around until 14:00 ;))?  
+Time to think... How can we write the test to make the server sleep (without waiting around until 14:00 ;))?  
 
 Hmm... Well, how would we implement the production code?  
 Usually, we would get the system time (`System.currentTimeMillis()`) or use a library (like joda-time) to get the time from the internal clock.  
