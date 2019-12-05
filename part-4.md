@@ -90,6 +90,7 @@ Here are some better ideas:
 - The nap hours could be put into a configuration file that the server reads when it starts. Then in our tests we can put hours in the configuration file that are inside or outside the current system time. But this requires us to start and stop the server with each test, which is undesireable due to the time it adds to the build. But still, it is a valid design.
 - We could use reflection to load a fake clock class in tests and a real system clock class in production, as long as the classes are in the classpath. Then in the test we can manipulate the fake clock with a static mutable variable. The name of the clock implementation class will be passed into the system or put into a configuration file. This is a common method used by libaraies (such as log4j and JDBC). This solution is advanced but it is a valid design.
 
+With each of the better ideas, we gain a configurable system.  
 Let's implement the reflection solution.
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**

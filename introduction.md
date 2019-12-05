@@ -1,5 +1,5 @@
 # TDD Tutorial
-This tutorial will give you a glimps into how TDD is done at [Wix](https://www.wix.com/).  
+This tutorial will give you a glimps into how TDD is done at [Wix](https://www.wix.engineering/).  
 The audience is assumed to have very little experience with TDD.  
 The tutorial is best experienced hands-on. Follow the tutorial in your own IDE.
 
