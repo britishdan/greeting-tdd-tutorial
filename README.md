@@ -85,7 +85,7 @@ First we will create a Maven project with this directory structure
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>greeting-server</artifactId>
+    <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
 </project>
 ```
@@ -116,7 +116,7 @@ Add Specs2 and Specs2-junit as a Maven dependency.
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>greeting-server</artifactId>
+    <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     
     <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
@@ -290,7 +290,7 @@ The quickest way to make the request with the [sttp](https://sttp.readthedocs.io
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>greeting-server</artifactId>
+    <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     
     <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
@@ -354,7 +354,7 @@ We do not know where to send the request because we have not created and started
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>greeting-server</artifactId>
+    <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     
     <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
@@ -1239,7 +1239,7 @@ We will use the `JMock` mocking library.
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wix</groupId>
-    <artifactId>greeting-server</artifactId>
+    <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     
     <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
@@ -1361,7 +1361,29 @@ class Greeter(clock: Clock) {
   }
 }
 ```
-The tests all pass.
+The tests all pass.  
+
+The final directory structure:  
+```
+/greeter-server
+  /src
+    /e2e
+      /scala
+        /com.wix
+          GreeterServerE2ETest.scala
+    /main
+      /scala
+        /com.wix
+          Clock.scala
+          Greeter.scala
+          GreeterServer.scala
+          GreetingHandler.scala
+    /test
+      /scala
+        /com.wix
+          GreeterTest.scala
+  pom.xml
+```
 
 ##### Summary
 Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.  
