@@ -63,11 +63,10 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 }
 ```
 Obviously, the test fails with `'Hello' != 'I'm Sleeping'`.  
-Time to think...  
+Time to think... How can write the test to make the server sleep (without waiting around until 14:00 ;))?  
 
-How can write the test to make the server sleep?  
 Hmm... Well, how would we implement the production code?  
-Usually, we would get the system time or use a library (like joda-time) to get the time from the internal clock.  
+Usually, we would get the system time (`System.currentTimeMillis()`) or use a library (like joda-time) to get the time from the internal clock.  
 But how can the test change the system's internal clock? Even if it is possible, it sounds destructive and probably not a good idea to manipulate the computer's clock.  
 So we need a different way to get the time.  
 
@@ -81,7 +80,7 @@ Welcome back :)
 
 Some ideas that come to mind:
 - We agree that the first idea of manipulating the system time is not a good idea.
-_ We could change the tests to assert "I'm Sleeping" instead of "Hello" if the tests are running during nap time. This is not desireable because we want all the features of the system to be tested at all times.
+- We could change the tests to assert "I'm Sleeping" instead of "Hello" if the tests are running during nap time. This is not desireable because we want all the features of the system to be tested at all times.
 - We could add the time to the request in the same way that name is passed. Then in our server we could check that if the time param exists, use it instead of the system's clock. Adding this param to the user facing API makes the API untidy and opens up the system for hacking which makes the system vulnerable. So it is also not a good idea.
 - We could add a configuration file that our server will read when it starts. In the configuration file we can add a "testing" flag. If the configuration is in test mode, we could say that the server is sleeping. The problem with this solution is that it adds a branch to the server (if (inTestMode) ... else ... ). That means that only the test side of the branch is tested and we never test the production branch. So it is also not a good idea.
 
