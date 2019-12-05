@@ -1,4 +1,4 @@
-#### Requirement 2 - Respond to a GET `/greeting` with “Hello”
+## Requirement 2 - Respond to a GET `/greeting` with “Hello”
 We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with "Hello"._  
 
@@ -159,7 +159,7 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 ```
 The tests are more concice and readable.  
 
-##### Summary
+## Summary
 In this section we learned:  
 1. Test code is code and should be kept to the same standards as production code (in this case, the DRY principle).
 2. Adding another E2E test shows that "Hello" value goes through all the layers of the system and reaches the user.

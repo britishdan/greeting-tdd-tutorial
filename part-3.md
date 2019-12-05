@@ -1,4 +1,4 @@
-#### Requirement 3 - Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
+## Requirement 3 - Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”
 We want our test to read:  
 _Given a running web server, when a GET request is made to `/greeting` with the `?name=Name` query param, the web server should respond with "Hello Name"._ 
 
@@ -164,7 +164,7 @@ class Greeter {
 Run the tests to make sure they still pass.  
 We're ready for the last requirement.  
 
-##### Summary
+## Summary
 In this section we learned:  
 1. Adding another E2E test for a request value that goes through the layers
 2. Importance of seeing the failing test message

@@ -1,4 +1,4 @@
-#### Requirement 4 - Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
+## Requirement 4 - Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
 Let's start to write the test.
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
@@ -451,7 +451,7 @@ The final directory structure:
   pom.xml
 ```
 
-##### Summary
+## Summary
 Perhaps the most important note about TDD, is that makes us think about the design of our system and hence it is said that TDD drives the design.  
 
 There is more we could do but we have implemented the system to satisfy the customer's requirements. We can show what we have and have a discussion with the customer about the next step.  

@@ -3,7 +3,7 @@ This tutorial will give you a glimps into how TDD is done at [Wix](https://www.w
 The audience is assumed to have very little experience with TDD.  
 The tutorial is best experienced hands-on. Follow the tutorial in your own IDE.
 
-> One must learn by doing the thing; for though you think you know it, you have no certainty, until you try.
+> One must learn by doing the thing; for though you think you know it, you have no certainty, until you try.  
 > —Sophocles
 
 ## Overview

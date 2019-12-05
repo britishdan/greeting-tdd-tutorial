@@ -15,7 +15,7 @@ The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial i
 3. [Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”](./part-3.md)
 4. [Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)](./part-4.md)
 
-#### Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
+## Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
 The first thing we want to do is create an _end to end_ test (E2E).  
 > _Take a moment_  
 > Think about what you expect the test to do.  
@@ -534,7 +534,7 @@ class GreetingHandler extends AbstractHandler {
 In your IDE, notice that there's warning at the end of the test after the closing brace. The warning is that `no implicits found...`. Add the Specs2 trait `MatchResultImplicits` that adds the implicits to get rid of the warning.  
 Run the test to make sure it still passes. The test feels like it also needs refactoring. But it is not clear what refactoring to make. So let's wait for another test to help make it clear.  
 
-##### Summary
+## Summary
 In this section we learned:  
 1. How working _outside-in_ integrates the parts of the system and shows how the API will be used.
 2. The 3 rules of TDD.
