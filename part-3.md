@@ -2,6 +2,8 @@
 We want our test to read:  
 _Given a running web server, when a GET request is made to `/greeting` with the `?name=Name` query param, the web server should respond with "Hello Name"._ 
 
+### Red
+
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
 package com.wix
@@ -61,7 +63,10 @@ The test needs to pass the name to the `whenGreetingIsCalled()` method so it can
 We do not want the change to effect the other tests, so we make the name param optional and only add the query param to the request if it is passed.  
 Before running the test, how do you expect the test to fail?  
 We expect the test to fail with `'Hello' != 'Hello Dalia'`.  
-Run the test and see that the test fails as expected. Let's implement the minimum amount of code to pass the test.  
+Run the test and see that the test fails as expected. 
+
+### Green
+Let's implement the minimum amount of code to pass the test.  
 
 **/src/main/scala/com/wix/GreeterHandler.scala**
 ```scala
@@ -119,7 +124,9 @@ class GreetingHandler extends AbstractHandler {
 }
 ```
 The tests are now green.  
-It is time to refactor!  
+
+### Refactor
+It's time to refactor!  
 It has become clear that the `GreetingHandler` is doing more than one thing. The handler is creating the greeting and also dealing with the Jetty request and response. Let's separate the concerns to separate classes.  
 
 **/src/main/scala/com/wix/GreeterHandler.scala**

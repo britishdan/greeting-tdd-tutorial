@@ -2,6 +2,8 @@
 We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with "Hello"._  
 
+### Red
+
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
 package com.wix
@@ -85,6 +87,8 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 }
 ```
 Run the tests again. The second test fails as we expected: `'' != 'Hello'`.  
+
+### Green
 Let's implement the feature to pass the test.
 
 **/src/main/scala/com/wix/GreeterHandler.scala**
@@ -109,7 +113,10 @@ class GreetingHandler extends AbstractHandler {
   }
 }
 ```
-Run the tests. They both pass. It's time to refactor!  
+Run the tests. They both pass.
+
+### Refactor
+It's time to refactor!  
 Adding the second test introduced code duplication. Test code is as important (if not more important) than the production code. So let's refactor the test code.  
 We only need one `HttpURLConnectionBackend` to manage the connection pool.  
 The call to the server is repeated, so we can extract it to a method.

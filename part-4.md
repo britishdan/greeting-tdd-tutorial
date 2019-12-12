@@ -1,5 +1,6 @@
 ## Requirement 4 - Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)
-Let's start to write the test.
+### Red
+Let's start to write the test.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -250,7 +251,10 @@ trait Clock {
 ```
 Notice that the FakeClock uses an `AtomicInteger` for the mutable state. We want access to this variable to be thread-safe because it is accessed from 2 threads, the test thread and the server thread.  
 
-Run the tests and see that the new test is still failing. We can now implement the feature using our new `Clock` class in the `greet()` method.  
+Run the tests and see that the new test is still failing.
+
+### Green
+We can now implement the feature using our new `Clock` class in the `greet()` method.  
 
 **/src/main/scala/com/wix/Greeter.scala**
 ```scala
@@ -292,6 +296,7 @@ Run the tests and see that they all pass.
 
 We have shown the implementation of the real clock `SystemTimeClock`. The class name `com.wix.SystemTimeClock` will be passed into the system in the production environment. Notice that the `SystemTimeClock` class is not tested. This is ok since we consider the `java.util` library to be well tested. But nonetheless, as with any integration, we will have to check that it works well when we deploy it to production.  
 
+### Refactor
 You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.  
 We will use the `JMock` mocking library.  
 

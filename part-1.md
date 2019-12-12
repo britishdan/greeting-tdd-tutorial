@@ -9,13 +9,8 @@ The web server is [Jetty](https://www.eclipse.org/jetty/).
 The HTTP client is [sttp](https://sttp.readthedocs.io/en/latest/).  
 The IDE I use is [Intellij](https://www.jetbrains.com/idea/), but the tutorial is agnostic to IDE. The tutorial assumes you have an IDE that supports Scala.  
 
-### Requirements
-1. [Respond to a GET `/greeting` with 200 HTTP status code](./part-1.md)
-2. [Respond to a GET `/greeting` with “Hello”](./part-2.md)
-3. [Respond to a GET `/greeting?name=Dalia` with “Hello Dalia”](./part-3.md)
-4. [Respond to any GET `/greeting` with “I’m Sleeping” between 14:00-16:00 (UTC)](./part-4.md)
-
 ## Requirement 1 - Respond to a GET /greeting with 200 HTTP status code
+### Create your first E2E
 The first thing we want to do is create an _end to end_ test (E2E).  
 > _Take a moment_  
 > Think about what you expect the test to do.  
@@ -49,6 +44,8 @@ First we will create a Maven project with this directory structure
 We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with a 200 HTTP status code._  
 So let's create a Specs2 test class in our E2E test file.  
+
+### Given
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -234,6 +231,7 @@ We give `start()` an empty implementation, so we satisfy rule #3. The test passe
 
 We have finished the _given_ section of the test, so we can move on to the _when_ section.  
 
+### When
 We want to make a GET request to the `/greeting` route.  
 The quickest way to make the request with the [sttp](https://sttp.readthedocs.io/en/latest/) client is by using a `basicRequest`.  
 
@@ -377,6 +375,7 @@ Notice that the port is passed to `start()` so it's available in the test.
 Run the test. It passes.  
 We have finished the _when_ section of the test, so we can move on to the _then_ section.  
 
+### Then
 The request to `/greeting` should return a 200 status code.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
