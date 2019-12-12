@@ -3,6 +3,7 @@ We want our test to read:
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with "Hello"._  
 
 ### Red
+Let's create the failing test.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala

@@ -169,7 +169,6 @@ class Greeter {
 }
 ```
 Run the tests to make sure they still pass.  
-We're ready for the last requirement.  
 
 ## Summary
 In this section we learned:  

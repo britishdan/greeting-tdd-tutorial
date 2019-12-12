@@ -9,7 +9,6 @@ class Greeter(clock: Clock) {
     }
   }
 
-  private def isAwake: Boolean = {
+  private def isAwake: Boolean =
     clock.hour < 14 || clock.hour > 15
-  }
 }

@@ -43,9 +43,9 @@ First we will create a Maven project with this directory structure
 
 We want our test to read:  
 _Given a running web server, when a GET request is made to the `/greeting` route, the web server should respond with a 200 HTTP status code._  
-So let's create a Specs2 test class in our E2E test file.  
 
 ### Given
+Let's create a Specs2 test class in our E2E test file.  
 
 **/src/e2e/scala/com/wix/GreeterServerE2ETest.scala**
 ```scala
@@ -228,7 +228,6 @@ class GreeterServer {
 }
 ```
 We give `start()` an empty implementation, so we satisfy rule #3. The test passes.  
-
 We have finished the _given_ section of the test, so we can move on to the _when_ section.  
 
 ### When

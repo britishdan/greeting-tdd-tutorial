@@ -261,17 +261,14 @@ We can now implement the feature using our new `Clock` class in the `greet()` me
 package com.wix
 
 class Greeter(clock: Clock) {
-  def greet(maybeName: Option[String]): String = {
-    (isAwake, maybeName) match {
-      case (true, None) ⇒ s"Hello"
-      case (true, Some(name)) ⇒ s"Hello $name"
-      case (false, _) ⇒ "I'm Sleeping"
-    }
-  }
-
-  private def isAwake: Boolean = {
-    clock.hour < 14 || clock.hour > 15
-  }
+  def greet(maybeName: Option[String] = None): String = 
+    if (clock.hour != 15)
+      maybeName match {
+        case None ⇒ "Hello"
+        case Some(name) ⇒ s"Hello $name"
+      }
+    else
+      "I'm Sleeping"
 }
 ```
 
@@ -297,8 +294,32 @@ Run the tests and see that they all pass.
 We have shown the implementation of the real clock `SystemTimeClock`. The class name `com.wix.SystemTimeClock` will be passed into the system in the production environment. Notice that the `SystemTimeClock` class is not tested. This is ok since we consider the `java.util` library to be well tested. But nonetheless, as with any integration, we will have to check that it works well when we deploy it to production.  
 
 ### Refactor
-You might be a little worried about the edge cases of the nap time in the `Greeter` class, so let's add some unit tests with a mock clock to feel more secure. This is our core logic after all.  
-We will use the `JMock` mocking library.  
+I am not too fond of the `if` statement with a nested pattern match in the `Greeter` class.  
+So I will refactor it to remove the nesting and only have a pattern match.  
+
+**/src/main/scala/com/wix/Greeter.scala**
+```scala
+package com.wix
+
+class Greeter(clock: Clock) {
+  def greet(maybeName: Option[String] = None): String = {
+    (isAwake, maybeName) match {
+      case (true, None) ⇒ s"Hello"
+      case (true, Some(name)) ⇒ s"Hello $name"
+      case (false, _) ⇒ "I'm Sleeping"
+    }
+  }
+
+  private def isAwake: Boolean = 
+    clock.hour != 15
+}
+```
+
+### Unit testing
+You might have noticed that the implementation `clock.hour != 15` is not complete since the Greeter will only sleep at 15:00.  
+So let's add some unit tests (UTs) with a mock clock. This is our core logic.  
+E2Es are slow and heavy because they start processes. We prefer writing UTs because they are light weight and run faster than E2Es.  
+We will use the `JMock` mocking library to mock the `Clock` trait.  
 
 **/pom.xml**
 ```xml
@@ -412,6 +433,7 @@ class GreeterTest extends SpecWithJUnit with JMock {
   }
 }
 ```
+The tests fail, so we fix the bug.  
 
 **/src/main/scala/com/wix/Greeter.scala**
 ```scala
