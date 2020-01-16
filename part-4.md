@@ -274,7 +274,7 @@ class Greeter(clock: Clock) {
 ```scala
 package com.wix
 
-import java.util.{Calendar, TimeZone}
+import java.time.{LocalTime, ZoneId}
 
 trait Clock {
   def hour: Int
@@ -282,8 +282,8 @@ trait Clock {
 
 class SystemTimeClock extends Clock {
   override def hour: Int = {
-    val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-    calendar.get(Calendar.HOUR_OF_DAY)
+    val localTime = LocalTime.now(ZoneId.of("UTC"))
+    localTime.getHour
   }
 }
 ```
