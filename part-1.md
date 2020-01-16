@@ -259,11 +259,11 @@ The quickest way to make the request with the [sttp](https://sttp.readthedocs.io
         <version>4.8.1</version>
         <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.softwaremill.sttp/core -->
+    <!-- https://mvnrepository.com/artifact/com.softwaremill.sttp.client/core -->
     <dependency>
         <groupId>com.softwaremill.sttp.client</groupId>
         <artifactId>core_2.12</artifactId>
-        <version>1.7.2</version>
+        <version>2.0.0-RC3</version>
         <scope>test</scope>
     </dependency>
 </project>
