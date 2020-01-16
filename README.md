@@ -1,7 +1,7 @@
 # Greeter Server TDD Tutorial
 
 ### Introduction
-Start here with a short [TDD Introduction](./introduction.md)
+[Start here](./introduction.md)
 
 ### Tutorial
 1. [Respond to a GET `/greeting` with 200 HTTP status code](./part-1.md)
