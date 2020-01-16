@@ -162,13 +162,13 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 }
 
 class FakeClock extends Clock {
-  def hour: Int = FakeClock.theHour.get()
+  override def hour: Int = FakeClock.theHour
 }
 
 object FakeClock {
-  private val theHour: AtomicInteger = new AtomicInteger()
+  private var theHour: Int = 0
 
-  def setHour(hour: Int): Unit = theHour.set(hour)
+  def setHour(hour: Int): Unit = theHour = hour
 }
 ```
 
@@ -249,8 +249,6 @@ trait Clock {
   def hour: Int
 }
 ```
-Notice that the FakeClock uses an `AtomicInteger` for the mutable state. We want access to this variable to be thread-safe because it is accessed from 2 threads, the test thread and the server thread.  
-
 Run the tests and see that the new test is still failing.
 
 ### Green

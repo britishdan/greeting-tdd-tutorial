@@ -67,11 +67,11 @@ class GreeterServerE2ETest extends SpecWithJUnit with MatchResultImplicits with 
 }
 
 class FakeClock extends Clock {
-  def hour: Int = FakeClock.theHour.get()
+  override def hour: Int = FakeClock.theHour
 }
 
 object FakeClock {
-  private val theHour: AtomicInteger = new AtomicInteger()
+  private var theHour: Int = 0
 
-  def setHour(hour: Int): Unit = theHour.set(hour)
+  def setHour(hour: Int): Unit = theHour = hour
 }
