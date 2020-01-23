@@ -243,8 +243,6 @@ class Greeter {
 ```scala
 package com.wix
 
-import java.util.{Calendar, TimeZone}
-
 trait Clock {
   def hour: Int
 }
