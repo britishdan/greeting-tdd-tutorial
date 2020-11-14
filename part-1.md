@@ -72,19 +72,21 @@ Add Specs2 and Specs2-junit as a Maven dependency.
     <artifactId>greeter-server</artifactId>
     <version>1.0-SNAPSHOT</version>
     
-    <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
-    <dependency>
-        <groupId>org.specs2</groupId>
-        <artifactId>specs2-core_2.12</artifactId>
-        <version>4.8.1</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.specs2</groupId>
-        <artifactId>specs2-junit_2.12</artifactId>
-        <version>4.8.1</version>
-        <scope>test</scope>
-    </dependency>
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.specs2/specs2-core -->
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2-core_2.12</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.specs2</groupId>
+            <artifactId>specs2-junit_2.12</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
 ```
 Allow your IDE to import the dependencies and `SpecWithJUnit` will be recognized.  
