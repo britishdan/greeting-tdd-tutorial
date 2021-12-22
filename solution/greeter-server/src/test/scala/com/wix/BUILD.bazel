@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+specs2_unit_test(
+    name = "wix",
+    srcs = glob(["*.scala"]),
+    deps = [
+        "//server-onboarding/greeter-server/src/main/scala/com/wix",
+        "@com_wix_specs2_jmock_2_12",
+    ],
+)

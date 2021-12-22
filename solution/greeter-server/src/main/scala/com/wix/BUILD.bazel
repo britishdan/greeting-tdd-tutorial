@@ -1,0 +1,10 @@
+package(default_visibility = ["//visibility:public"])
+
+scala_library(
+    name = "wix",
+    srcs = glob(["*.scala"]),
+    deps = [
+        "@org_eclipse_jetty_jetty_server",
+        "@org_eclipse_jetty_jetty_util",
+    ],
+)

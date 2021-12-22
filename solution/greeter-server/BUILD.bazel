@@ -1,0 +1,13 @@
+package(default_visibility = ["//visibility:public"])
+
+scala_library(
+    name = "domain",
+    srcs = glob(["*.scala"]),
+    deps = [
+        "@server_infra//framework/pii/annotations/src/main/scala/com/wixpress/pii",
+        "@server_infra//iptf/simple-data-layer/src/main/scala/com/wixpress/infra/sdl/api/id",
+        "@server_infra//iptf/simple-data-layer/src/main/scala/com/wixpress/infra/sdl/api/pii",
+        "@server_infra//iptf/simple-data-layer/src/main/scala/com/wixpress/infra/sdl/harvester/client/api",
+        "@server_infra//iptf/wixerd/api-gateway-client-parent/api-gateway-client-util/src/main/scala/com/wixpress/wixerd/enricher",
+    ],
+)
